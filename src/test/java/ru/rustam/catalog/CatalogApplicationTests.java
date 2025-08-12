@@ -1,4 +1,4 @@
-package ru.rustam.catalog.catalog;
+package ru.rustam.catalog;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

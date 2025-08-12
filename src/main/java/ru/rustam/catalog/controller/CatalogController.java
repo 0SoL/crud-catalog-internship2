@@ -1,15 +1,12 @@
-package ru.rustam.catalog.catalog.controller;
+package ru.rustam.catalog.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.rustam.catalog.catalog.dto.CatalogDto;
-import ru.rustam.catalog.catalog.dto.mapping.CatalogMapping;
-import ru.rustam.catalog.catalog.entity.CatalogEntity;
-import ru.rustam.catalog.catalog.service.CatalogService;
+import ru.rustam.catalog.dto.CatalogDto;
+import ru.rustam.catalog.dto.CreateCatalogDto;
+import ru.rustam.catalog.service.CatalogService;
 
-import javax.xml.catalog.Catalog;
 import java.util.List;
 
 @RestController
@@ -24,13 +21,13 @@ public class CatalogController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CatalogDto create(@RequestBody CatalogDto catalogDto) {
-        return catalogService.create(catalogDto);
+    public CatalogDto create(@RequestBody CreateCatalogDto createCatalogDto) {
+        return catalogService.create(createCatalogDto);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CatalogDto findAll(@PathVariable("id") Integer id) {
+    public CatalogDto findById(@PathVariable("id") Integer id) {
         return catalogService.findById(id);
     }
 
@@ -42,7 +39,8 @@ public class CatalogController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CatalogDto delete(@PathVariable("id") Integer id,@RequestBody CatalogDto catalogDto) {
+    public CatalogDto updateById(@PathVariable("id") Integer id,
+                                 @RequestBody CatalogDto catalogDto) {
         return catalogService.updateById(id, catalogDto);
     }
 
@@ -52,3 +50,13 @@ public class CatalogController {
         catalogService.deleteById(id);
     }
 }
+
+
+// Для создания создавать new Dto отдельный ,
+// Integer ,
+// два метода одинаковые названияч,
+// постман ,
+// просто класс для маппинга вместо интерфейс(сделать его бином @Mapper)
+// маппер, прайваты ,
+// рефакторить код добавить методы,
+// ознакомится со stream()

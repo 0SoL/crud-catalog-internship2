@@ -1,4 +1,4 @@
-package ru.rustam.catalog.catalog.entity;
+package ru.rustam.catalog.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,8 +14,8 @@ import lombok.*;
 public class CatalogEntity {
     @Id
     @GeneratedValue
-    int id;
-    String name;
-    String description;
-    double price;
+    private int id;
+    private String name;
+    private String description;
+    private double price;
 }

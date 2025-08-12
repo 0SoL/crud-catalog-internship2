@@ -1,12 +1,13 @@
-package ru.rustam.catalog.catalog.dto.mapping;
+package ru.rustam.catalog.dto.mapping;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import ru.rustam.catalog.catalog.dto.CatalogDto;
-import ru.rustam.catalog.catalog.entity.CatalogEntity;
+import org.springframework.stereotype.Component;
+import ru.rustam.catalog.dto.CatalogDto;
+import ru.rustam.catalog.dto.CreateCatalogDto;
+import ru.rustam.catalog.entity.CatalogEntity;
 
-public interface CatalogMapping {
-    public static CatalogEntity toEntity(CatalogDto dto) {
+@Component
+public class CatalogMapper {
+    public static CatalogEntity toEntity(CreateCatalogDto dto) {
         CatalogEntity e = new CatalogEntity();
         e.setName(dto.getName());
         e.setDescription(dto.getDescription());
