@@ -1,4 +1,4 @@
-package ru.rustam.catalog.catalog.dto;
+package ru.rustam.catalog.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,11 +6,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class CatalogDto {
-    int id;
+    private int id;
     private String name;
     private String description;
     private double price;
-
-
-
 }
+
+
