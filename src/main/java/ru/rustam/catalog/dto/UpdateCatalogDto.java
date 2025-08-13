@@ -1,7 +1,6 @@
 package ru.rustam.catalog.dto;
 
 import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -11,7 +10,8 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class CreateCatalogDto {
+public class UpdateCatalogDto {
+    private Integer id;
     @Size(min = 3, max = 100, message = "Название должно иметь не меньше {min} символов и не больше {max}")
     private String name;
     @Size(max = 255, message = "Описание не должно иметь больше 200 символов")

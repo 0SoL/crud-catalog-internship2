@@ -1,0 +1,5 @@
+export DATASOURCE_HOST=localhost
+export DATASOURCE_PORT=5432
+export DATASOURCE_NAME=catalog_db
+export DATASOURCE_USERNAME=app_user
+export DATASOURCE_PASSWORD=Rustam9632949249r

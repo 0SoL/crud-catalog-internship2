@@ -1,10 +1,12 @@
 package ru.rustam.catalog.controller;
 
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
+import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.service.CatalogService;
 
 import java.util.List;
@@ -21,7 +23,7 @@ public class CatalogController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CatalogDto create(@RequestBody CreateCatalogDto createCatalogDto) {
+    public CatalogDto create(@Valid @RequestBody CreateCatalogDto createCatalogDto) {
         return catalogService.create(createCatalogDto);
     }
 
@@ -40,8 +42,8 @@ public class CatalogController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CatalogDto updateById(@PathVariable("id") Integer id,
-                                 @RequestBody CatalogDto catalogDto) {
-        return catalogService.updateById(id, catalogDto);
+                                 @Valid @RequestBody UpdateCatalogDto updateCatalogDto) {
+        return catalogService.updateById(id, updateCatalogDto);
     }
 
     @DeleteMapping("/{id}")
@@ -60,3 +62,9 @@ public class CatalogController {
 // маппер, прайваты ,
 // рефакторить код добавить методы,
 // ознакомится со stream()
+
+
+// 13 августа , yml , мерджить , убрать validated. yml noun.
+
+// Task. Добавление изображение, когда все товары выводим , показываем путь к мейн фото. Когда к определенному , все фотографии все пути этого товара.
+// ManyToOne. Улучшить с метод с фотками, эндпойт. Изменить фотографию методы и тд.
