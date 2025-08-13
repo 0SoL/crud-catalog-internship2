@@ -2,9 +2,9 @@ spring:
   application:
     name: catalog
   datasource:
-    url: jdbc:postgresql://localhost:5432/catalog_db
-    username: app_user
-    password: Rustam9632949249r
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:5432}/${DATASOURCE_NAME:mydb}
+    username: ${DATASOURCE_USERNAME:app_user}
+    password: ${DATASOURCE_PASSWORD:secret}
   jpa:
     hibernate:
       ddl-auto: validate
