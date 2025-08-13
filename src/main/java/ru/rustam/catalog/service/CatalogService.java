@@ -15,7 +15,6 @@ import ru.rustam.catalog.repository.CatalogRepository;
 import java.util.List;
 
 @Service
-@Validated
 public class CatalogService {
     private final CatalogRepository catalogRepository;
     private final CatalogMapper catalogMapper;
