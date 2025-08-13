@@ -1,5 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/catalog_db
-    username: app_user
-    password: Rustam9632949249r

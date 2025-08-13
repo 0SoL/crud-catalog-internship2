@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/catalog_db
     username: app_user
-    password: 123
+    password: Rustam9632949249r
   jpa:
     hibernate:
       ddl-auto: validate
