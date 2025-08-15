@@ -38,6 +38,9 @@ public class CatalogService {
         CatalogEntity catalogEntity = catalogRepository.save(catalogMapper.toEntity(createCatalogDto));
 
         for (FileEntity file : files) {
+            if (file.getCatalog() != null) {
+                throw new IllegalArgumentException("Файл уже принадлежит какой то карточке: " + file.getName());
+            }
             file.setCatalog(catalogEntity);
         }
         fileRepository.saveAll(files);
@@ -64,10 +67,27 @@ public class CatalogService {
 
     // сервис для обновления определенного объекта
     public CatalogDto updateById(Integer id, UpdateCatalogDto updateCatalogDto) {
+        // проверял добавление изображения и заметил что у меня просто стирает остальные данные
         CatalogEntity catalogEntity = getCatalogEntity(id);
-        catalogEntity.setName(updateCatalogDto.getName());
-        catalogEntity.setDescription(updateCatalogDto.getDescription());
-        catalogEntity.setPrice(updateCatalogDto.getPrice());
+        if (updateCatalogDto.getNewImageIds() != null && !updateCatalogDto.getNewImageIds().isEmpty()) {
+            List<FileEntity> files = fileRepository.findAllById(updateCatalogDto.getNewImageIds());
+            for (FileEntity file : files) {
+                file.setCatalog(catalogEntity);
+            }
+            catalogEntity.getImages().addAll(files);
+        }
+        if (updateCatalogDto.getName() != null && !updateCatalogDto.getName().isEmpty()) {
+            catalogEntity.setName(updateCatalogDto.getName());
+        }
+        if (updateCatalogDto.getDescription() != null && !updateCatalogDto.getDescription().isEmpty()) {
+            catalogEntity.setDescription(updateCatalogDto.getDescription());
+        }
+        if (updateCatalogDto.getPrice() != null) {
+            catalogEntity.setPrice(updateCatalogDto.getPrice());
+        }
+        if (updateCatalogDto.getPrimaryImage() != null) {
+            catalogEntity.setPrimaryImage(updateCatalogDto.getPrimaryImage());
+        }
         catalogRepository.save(catalogEntity);
         return catalogMapper.toDto(catalogEntity);
     }
