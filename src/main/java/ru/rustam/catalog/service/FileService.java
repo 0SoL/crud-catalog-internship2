@@ -25,6 +25,10 @@ public class FileService {
     }
 
     public FileDto save(MultipartFile file) throws IOException {
+        if (file.getSize() > 2621440 / 2) { // 2.5мб
+            throw new IllegalArgumentException("Размер файла слишком большой! " + file.getOriginalFilename());
+        };
+
         FileEntity fileEntity = new FileEntity();
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
         String extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
