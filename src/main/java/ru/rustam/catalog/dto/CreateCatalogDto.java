@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +20,7 @@ public class CreateCatalogDto {
     @Positive(message = "Цена не может быть отрицательной")
     @Digits(integer=8, fraction = 2)
     private BigDecimal price;
+    private List<Integer> imagesIds;
+    private Integer primaryImage;
+
 }
