@@ -5,10 +5,7 @@ import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
 import ru.rustam.catalog.dto.FileDto;
 import ru.rustam.catalog.entity.CatalogEntity;
-import ru.rustam.catalog.entity.FileEntity;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component

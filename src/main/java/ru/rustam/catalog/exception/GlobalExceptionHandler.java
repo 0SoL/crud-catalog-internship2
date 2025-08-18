@@ -22,11 +22,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    // для ловли ошибок по файлу
+
     @ExceptionHandler(FileHandlerException.class)
     public ResponseEntity<String> handeFileHandlerException(FileHandlerException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
 
     @ExceptionHandler(ImageException.class)
     public ResponseEntity<String> handeImageException(ImageException ex) {

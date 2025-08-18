@@ -9,7 +9,6 @@ import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.entity.FileEntity;
-import ru.rustam.catalog.exception.FileHandlerException;
 import ru.rustam.catalog.exception.ImageException;
 import ru.rustam.catalog.mapper.CatalogMapper;
 import ru.rustam.catalog.entity.CatalogEntity;
@@ -108,7 +107,6 @@ public class CatalogService {
         return catalogRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукт не найден!"));
     }
-
 }
 
 // Контроллер <— DTO —> Сервис <— Entity —> Репозиторий <—> БД

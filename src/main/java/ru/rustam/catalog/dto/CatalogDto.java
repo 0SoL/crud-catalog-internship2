@@ -1,9 +1,7 @@
 package ru.rustam.catalog.dto;
 
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
-import ru.rustam.catalog.entity.FileEntity;
 
 import java.math.BigDecimal;
 import java.util.List;

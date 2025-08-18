@@ -1,7 +1,6 @@
 package ru.rustam.catalog.service;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import ru.rustam.catalog.mapper.FileMapper;
 import ru.rustam.catalog.repository.FileRepository;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -30,13 +28,13 @@ public class FileService {
         this.fileMapper = fileMapper;
     }
 
-    public FileDto save(MultipartFile file) throws IOException {
+    public FileDto save(MultipartFile file) {
         int maxByte = 2621440;
         if (file.getSize() > maxByte) {
             throw new FileHandlerException("Размер файла слишком большой! " + file.getOriginalFilename());
-        };
+        }
         if (!ImageType.isImageType(file.getContentType())) {
-            throw new FileHandlerException("Не поддерживаемый тип файлы (только jpeg,jpg,png,gif): "  + file.getContentType());
+            throw new FileHandlerException("Не поддерживаемый тип файла! "  + file.getContentType());
         }
         FileEntity fileEntity = new FileEntity();
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
@@ -48,7 +46,7 @@ public class FileService {
         fileEntity.setFilepath(filePath);
         fileEntity = fileRepository.save(fileEntity);
         return fileMapper.toDto(fileEntity);
-    };
+    }
 
     public FileDto findFileById(Integer id) {
         FileEntity fileEntity = fileRepository.findById(id).orElseThrow(() -> new FileHandlerException("Файл с таким id не был найден: " + id));
@@ -76,5 +74,5 @@ public class FileService {
             }
             return false;
         }
-    };
+    }
 }
