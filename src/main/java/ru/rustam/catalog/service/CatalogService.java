@@ -10,11 +10,13 @@ import ru.rustam.catalog.dto.CreateCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.entity.FileEntity;
 import ru.rustam.catalog.exception.FileHandlerException;
+import ru.rustam.catalog.exception.ImageException;
 import ru.rustam.catalog.mapper.CatalogMapper;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.repository.CatalogRepository;
 import ru.rustam.catalog.repository.FileRepository;
 
+import java.awt.*;
 import java.util.List;
 
 @Service
@@ -35,16 +37,16 @@ public class CatalogService {
         CatalogEntity catalogEntity = catalogRepository.save(catalogMapper.toEntity(createCatalogDto));
 
         if (!createCatalogDto.getImagesIds().contains(createCatalogDto.getPrimaryImage())) {
-            throw new FileHandlerException("Primary image не найден, выберите Primary image из ваших imageIds");
+            throw new ImageException("Primary image не найден, выберите Primary image из ваших imageIds");
         }
 
         FileEntity primaryImage = fileRepository.findById(createCatalogDto.getPrimaryImage())
-                .orElseThrow(() -> new FileHandlerException("Primary image не найден"));
+                .orElseThrow(() -> new ImageException("Primary image не найден"));
         catalogEntity.setPrimaryImage(primaryImage);
 
         for (FileEntity file : files) {
             if (file.getCatalog() != null) {
-                throw new FileHandlerException("Файл уже принадлежит какой то карточке: " + file.getName());
+                throw new ImageException("Файл уже принадлежит какой то карточке: " + file.getName());
             }
             file.setCatalog(catalogEntity);
         }
@@ -87,7 +89,7 @@ public class CatalogService {
         }
         if (updateCatalogDto.getPrimaryImage() != null) {
             FileEntity primaryImage = fileRepository.findById(updateCatalogDto.getPrimaryImage())
-                    .orElseThrow(() -> new FileHandlerException("Primary image не найден"));
+                    .orElseThrow(() -> new ImageException("Primary image не найден"));
             catalogEntity.setPrimaryImage(primaryImage);
         }
         catalogRepository.save(catalogEntity);
