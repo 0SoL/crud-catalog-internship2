@@ -21,6 +21,7 @@ public class FileService {
     private final FileMapper fileMapper;
     @Value("${file.upload-path}")
     private String folderPath;
+    private final static int maxByte = 2621440;
 
     @Autowired
     public FileService(FileRepository fileRepository, FileMapper fileMapper) {
@@ -29,7 +30,6 @@ public class FileService {
     }
 
     public FileDto save(MultipartFile file) {
-        int maxByte = 2621440;
         if (file.getSize() > maxByte) {
             throw new FileHandlerException("Размер файла слишком большой! " + file.getOriginalFilename());
         }
