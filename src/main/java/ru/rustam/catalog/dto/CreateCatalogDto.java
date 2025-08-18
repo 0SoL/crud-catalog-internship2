@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import ru.rustam.catalog.entity.FileEntity;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,5 +22,4 @@ public class CreateCatalogDto {
     private BigDecimal price;
     private List<Integer> imagesIds;
     private Integer primaryImage;
-
 }

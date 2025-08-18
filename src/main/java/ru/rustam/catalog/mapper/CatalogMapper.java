@@ -7,6 +7,8 @@ import ru.rustam.catalog.dto.FileDto;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.entity.FileEntity;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -22,7 +24,7 @@ public class CatalogMapper {
         e.setName(dto.getName());
         e.setDescription(dto.getDescription());
         e.setPrice(dto.getPrice());
-        e.setPrimaryImage(dto.getPrimaryImage());
+//        e.setPrimaryImage(dto.getPrimaryImage());
         return e;
     }
     public CatalogDto toDto(CatalogEntity e) {
@@ -31,12 +33,12 @@ public class CatalogMapper {
         dto.setName(e.getName());
         dto.setDescription(e.getDescription());
         dto.setPrice(e.getPrice());
-        List<FileDto> images = (e.getImages() == null ? List.<FileEntity>of() : e.getImages())
+        List<FileDto> images = (e.getImages())
                 .stream()
                 .map(fileMapper::toDto)
                 .toList();
         dto.setImages(images);
-        dto.setPrimaryImage(e.getPrimaryImage());
+        dto.setPrimaryImageId(e.getPrimaryImage().getId());
         return dto;
     }
 }

@@ -21,11 +21,10 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(errors);
     }
+
     // для ловли ошибок по файлу
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handeIllegalArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler(FileHandlerException.class)
+    public ResponseEntity<String> handeFileHandlerException(FileHandlerException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
-
 }

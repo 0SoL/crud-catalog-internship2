@@ -9,6 +9,7 @@ import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.entity.FileEntity;
+import ru.rustam.catalog.exception.FileHandlerException;
 import ru.rustam.catalog.mapper.CatalogMapper;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.repository.CatalogRepository;
@@ -29,43 +30,44 @@ public class CatalogService {
         this.catalogMapper = catalogMapper;
     }
 
-    // сервис для создания объекта
     public CatalogDto create(CreateCatalogDto createCatalogDto) {
         List<FileEntity> files = fileRepository.findAllById(createCatalogDto.getImagesIds());
         CatalogEntity catalogEntity = catalogRepository.save(catalogMapper.toEntity(createCatalogDto));
 
+        if (!createCatalogDto.getImagesIds().contains(createCatalogDto.getPrimaryImage())) {
+            throw new FileHandlerException("Primary image не найден, выберите Primary image из ваших imageIds");
+        }
+
+        FileEntity primaryImage = fileRepository.findById(createCatalogDto.getPrimaryImage())
+                .orElseThrow(() -> new FileHandlerException("Primary image не найден"));
+        catalogEntity.setPrimaryImage(primaryImage);
+
         for (FileEntity file : files) {
             if (file.getCatalog() != null) {
-                throw new IllegalArgumentException("Файл уже принадлежит какой то карточке: " + file.getName());
+                throw new FileHandlerException("Файл уже принадлежит какой то карточке: " + file.getName());
             }
             file.setCatalog(catalogEntity);
         }
         fileRepository.saveAll(files);
         catalogEntity.setImages(files);
         return catalogMapper.toDto(catalogEntity);
-        // отдельный create для изображении, потом уже связывать с каталогом
-        // перенести верхний сервис в отдельный сервис
-        // два контроела , никуда не привязывается, при создании каталога из контроелар файла получаем айди для контроела продукта и так и привязываем
     }
 
-    // сервис для поиска объекта по id
     public CatalogDto findById(Integer id) {
         CatalogEntity catalogEntity = getCatalogEntity(id);
         return catalogMapper.toDto(catalogEntity);
     }
-    // сервисч для вывода всех объектов
-    // сервисч для вывода всех объектов
+
     public List<CatalogDto> findAll() {
-        return catalogRepository.findPrimaryImage()
+        return catalogRepository
+                .findAll()
                 .stream()
                 .map(catalogMapper::toDto)
                 .toList();
     }
 
-    // сервис для обновления определенного объекта
     @Transactional
     public CatalogDto updateById(Integer id, UpdateCatalogDto updateCatalogDto) {
-        // проверял добавление изображения и заметил что у меня просто стирает остальные данные
         CatalogEntity catalogEntity = getCatalogEntity(id);
         if (updateCatalogDto.getNewImageIds() != null && !updateCatalogDto.getNewImageIds().isEmpty()) {
             List<FileEntity> files = fileRepository.findAllById(updateCatalogDto.getNewImageIds());
@@ -84,7 +86,9 @@ public class CatalogService {
             catalogEntity.setPrice(updateCatalogDto.getPrice());
         }
         if (updateCatalogDto.getPrimaryImage() != null) {
-            catalogEntity.setPrimaryImage(updateCatalogDto.getPrimaryImage());
+            FileEntity primaryImage = fileRepository.findById(updateCatalogDto.getPrimaryImage())
+                    .orElseThrow(() -> new FileHandlerException("Primary image не найден"));
+            catalogEntity.setPrimaryImage(primaryImage);
         }
         catalogRepository.save(catalogEntity);
         return catalogMapper.toDto(catalogEntity);
@@ -100,7 +104,7 @@ public class CatalogService {
 
     private CatalogEntity getCatalogEntity(Integer id) {
         return catalogRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукт не найден!"));
     }
 
 }

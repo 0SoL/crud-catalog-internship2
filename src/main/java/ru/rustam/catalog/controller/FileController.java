@@ -2,6 +2,7 @@ package ru.rustam.catalog.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.rustam.catalog.dto.FileDto;
@@ -22,4 +23,12 @@ public class FileController {
     public FileDto uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
         return fileService.save(file);
     }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public FileDto findById(@PathVariable Integer id) {
+        return fileService.findFileById(id);
+    }
+
+
 }

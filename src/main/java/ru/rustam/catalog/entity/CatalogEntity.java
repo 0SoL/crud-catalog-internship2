@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 @Setter
 @Getter
-@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,9 +28,9 @@ public class CatalogEntity {
     private BigDecimal price;
     @OneToMany(cascade = CascadeType.ALL,
                 mappedBy = "catalog")
-    private List<FileEntity> images = new ArrayList<>();
-    @Column(name="primary_image") // ImageEntity BeDirectional связь.
-    private Integer primaryImage;
+    private List<FileEntity> images = new ArrayList<>();// ImageEntity BeDirectional связь.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_image_id")
+    private FileEntity primaryImage; // перенсти сущность FileEntity , оставить ссылку на FileEntity
 }
-// primary image id ссылка на main image
-//
+
