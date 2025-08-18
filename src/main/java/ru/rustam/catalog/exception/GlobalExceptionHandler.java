@@ -1,5 +1,6 @@
 package ru.rustam.catalog.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,5 +20,17 @@ public class GlobalExceptionHandler {
                 .toList();
 
         return ResponseEntity.badRequest().body(errors);
+    }
+
+
+    @ExceptionHandler(FileHandlerException.class)
+    public ResponseEntity<String> handeFileHandlerException(FileHandlerException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(ImageException.class)
+    public ResponseEntity<String> handeImageException(ImageException ex) {
+        return  new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

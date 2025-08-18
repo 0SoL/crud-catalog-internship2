@@ -39,7 +39,7 @@ public class CatalogController {
         return catalogService.findAll();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}") // СПРОСИТЬ ПРО PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public CatalogDto updateById(@PathVariable("id") Integer id,
                                  @Valid @RequestBody UpdateCatalogDto updateCatalogDto) {
@@ -68,3 +68,17 @@ public class CatalogController {
 
 // Task. Добавление изображение, когда все товары выводим , показываем путь к мейн фото. Когда к определенному , все фотографии все пути этого товара.
 // ManyToOne. Улучшить с метод с фотками, эндпойт. Изменить фотографию методы и тд.
+
+
+// Сначала файнал поля
+// Вынести в контсанту
+// Завести enum для проверок формата файла
+// новые миграции создавать
+// убрать column
+// експешн чтоб не конфликтовало с фотками
+// begenerational связь
+// создать свой exception кастомный унаследовать runtime и кидать (400)
+// проверить варнинги
+// избавится от querry. File Entity
+
+// Нужен эндпоинт для запроса файла. по айдишнику /images/id.
