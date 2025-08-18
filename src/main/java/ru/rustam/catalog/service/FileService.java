@@ -8,8 +8,13 @@ import ru.rustam.catalog.entity.FileEntity;
 import ru.rustam.catalog.mapper.FileMapper;
 import ru.rustam.catalog.repository.FileRepository;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,7 +33,9 @@ public class FileService {
         if (file.getSize() > 2621440 / 2) { // 2.5мб
             throw new IllegalArgumentException("Размер файла слишком большой! " + file.getOriginalFilename());
         };
-
+        if (!List.of("image/jpeg", "image/png", "image/gif").contains(file.getContentType())) {
+            throw new IllegalArgumentException("Не поддерживаемый тип файлы (только jpeg,png,gif): "  + file.getContentType());
+        }
         FileEntity fileEntity = new FileEntity();
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
         String extension = originalFilename.substring(originalFilename.lastIndexOf('.'));

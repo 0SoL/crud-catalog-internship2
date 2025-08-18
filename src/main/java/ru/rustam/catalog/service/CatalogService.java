@@ -1,7 +1,7 @@
 package ru.rustam.catalog.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,9 +21,6 @@ public class CatalogService {
     private final CatalogRepository catalogRepository;
     private final FileRepository fileRepository;
     private final CatalogMapper catalogMapper;
-
-    @Value("${file.upload-path}")
-    private String folderPath;
 
     @Autowired
     public CatalogService(CatalogRepository catalogRepository, FileRepository fileRepository, CatalogMapper catalogMapper) {
@@ -56,7 +53,7 @@ public class CatalogService {
         CatalogEntity catalogEntity = getCatalogEntity(id);
         return catalogMapper.toDto(catalogEntity);
     }
-
+    // сервисч для вывода всех объектов
     // сервисч для вывода всех объектов
     public List<CatalogDto> findAll() {
         return catalogRepository.findPrimaryImage()
@@ -66,6 +63,7 @@ public class CatalogService {
     }
 
     // сервис для обновления определенного объекта
+    @Transactional
     public CatalogDto updateById(Integer id, UpdateCatalogDto updateCatalogDto) {
         // проверял добавление изображения и заметил что у меня просто стирает остальные данные
         CatalogEntity catalogEntity = getCatalogEntity(id);

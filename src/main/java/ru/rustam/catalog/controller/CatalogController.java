@@ -39,7 +39,7 @@ public class CatalogController {
         return catalogService.findAll();
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}") // СПРОСИТЬ ПРО PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public CatalogDto updateById(@PathVariable("id") Integer id,
                                  @Valid @RequestBody UpdateCatalogDto updateCatalogDto) {
