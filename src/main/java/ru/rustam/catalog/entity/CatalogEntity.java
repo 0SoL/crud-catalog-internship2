@@ -32,5 +32,10 @@ public class CatalogEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "primary_image_id")
     private FileEntity primaryImage; // перенсти сущность FileEntity , оставить ссылку на FileEntity
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
 }
 

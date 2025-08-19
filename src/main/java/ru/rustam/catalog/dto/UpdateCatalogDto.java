@@ -22,4 +22,5 @@ public class UpdateCatalogDto {
     private BigDecimal price;
     private Integer primaryImage;
     private List<Integer> newImageIds;
+    private List<CategoryDto> newCategories;
 }

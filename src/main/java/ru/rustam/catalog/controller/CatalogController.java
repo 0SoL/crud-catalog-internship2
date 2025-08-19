@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
+import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.service.CatalogService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -35,8 +37,19 @@ public class CatalogController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CatalogDto> findAll() {
-        return catalogService.findAll();
+    public List<CatalogDto> findAll(@RequestParam(required = false) String name,
+                                    @RequestParam(required = false) String description,
+                                    @RequestParam(required = false) BigDecimal min,
+                                    @RequestParam(required = false) BigDecimal max,
+                                    @RequestParam(required = false) Boolean photo
+                                    ) {
+        CatalogDto catalogDto = new CatalogDto();
+        catalogDto.setName(name);
+        catalogDto.setDescription(description);
+        catalogDto.setMin(min);
+        catalogDto.setMax(max);
+        catalogDto.setPhoto(photo);
+        return catalogService.findAll(catalogDto);
     }
 
     @PutMapping("/{id}") // СПРОСИТЬ ПРО PatchMapping

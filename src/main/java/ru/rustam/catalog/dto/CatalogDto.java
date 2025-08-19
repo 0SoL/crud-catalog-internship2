@@ -15,6 +15,10 @@ public class CatalogDto {
     private BigDecimal price;
     private Integer primaryImageId;
     private List<FileDto> images;
+    private Integer category;
+    private BigDecimal min;
+    private BigDecimal max;
+    private Boolean photo;
 }
 
 
