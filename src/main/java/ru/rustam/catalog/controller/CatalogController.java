@@ -2,15 +2,17 @@ package ru.rustam.catalog.controller;
 
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
+import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.service.CatalogService;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -37,19 +39,13 @@ public class CatalogController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CatalogDto> findAll(@RequestParam(required = false) String name,
-                                    @RequestParam(required = false) String description,
-                                    @RequestParam(required = false) BigDecimal min,
-                                    @RequestParam(required = false) BigDecimal max,
-                                    @RequestParam(required = false) Boolean photo
-                                    ) {
-        CatalogDto catalogDto = new CatalogDto();
-        catalogDto.setName(name);
-        catalogDto.setDescription(description);
-        catalogDto.setMin(min);
-        catalogDto.setMax(max);
-        catalogDto.setPhoto(photo);
-        return catalogService.findAll(catalogDto);
+    public List<CatalogDto> findAll() {
+        return catalogService.findAll();
+    }
+
+    @PostMapping("/search")
+    public Page<CatalogDto> search(@RequestBody FilteredCatalogDto filter) {
+        return catalogService.search(filter);
     }
 
     @PutMapping("/{id}") // СПРОСИТЬ ПРО PatchMapping
@@ -58,7 +54,6 @@ public class CatalogController {
                                  @Valid @RequestBody UpdateCatalogDto updateCatalogDto) {
         return catalogService.updateById(id, updateCatalogDto);
     }
-
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Integer id) {

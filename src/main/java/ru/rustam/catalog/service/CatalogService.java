@@ -2,12 +2,15 @@ package ru.rustam.catalog.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
+import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.entity.CategoryEntity;
 import ru.rustam.catalog.entity.FileEntity;
@@ -17,9 +20,7 @@ import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.repository.CatalogRepository;
 import ru.rustam.catalog.repository.CategoryRepository;
 import ru.rustam.catalog.repository.FileRepository;
-import ru.rustam.catalog.specs.CatalogSpecs;
 
-import javax.xml.catalog.Catalog;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -81,27 +82,11 @@ public class CatalogService {
         return catalogMapper.toDto(catalogEntity);
     }
 
-    public List<CatalogDto> findAll(CatalogDto catalogDto) {
-        Specification<CatalogEntity> spec = Specification.unrestricted();
-        if (catalogDto.getName() != null && !catalogDto.getName().isEmpty()) {
-            spec = spec.and(CatalogSpecs.nameContains(catalogDto.getName()));
-        }
-        if(catalogDto.getDescription() != null && !catalogDto.getDescription().isEmpty()) {
-            spec = spec.and(CatalogSpecs.descriptionContains(catalogDto.getDescription()));
-        }
-        if(catalogDto.getMin() != null && catalogDto.getMax() != null) {
-            spec = spec.and(CatalogSpecs.priceBetween(catalogDto.getMin(), catalogDto.getMax()));
-        }
-        if(catalogDto.getPhoto() != null) {
-            spec = spec.and(CatalogSpecs.photoContains(catalogDto.getPhoto()));
-        }
-//        return catalogRepository
-//                .findAll()
-//                .stream()
-//                .map(catalogMapper::toDto)
-//                .toList();
-
-        return catalogRepository.findAll(spec).stream().map(catalogMapper::toDto).toList();
+    public List<CatalogDto> findAll() {
+        return catalogRepository.findAll()
+                .stream()
+                .map(catalogMapper::toDto)
+                .toList();
     }
 
     @Transactional
@@ -137,6 +122,19 @@ public class CatalogService {
         CatalogEntity catalogEntity = getCatalogEntity(id);
         catalogRepository.delete(catalogEntity);
         catalogMapper.toDto(catalogEntity);
+    }
+
+    public Page<CatalogDto> search(FilteredCatalogDto filter) {
+        Pageable pageable = PageRequest.of(0, 4);
+        return catalogRepository.search(
+                filter.getName(),
+                filter.getDescription(),
+                filter.getMinPrice(),
+                filter.getMaxPrice(),
+                filter.getHasImages(),
+                filter.getCategoryId(),
+                pageable
+        ).map(catalogMapper::toDto);
     }
 
 
