@@ -14,4 +14,6 @@ public class FilteredCatalogDto {
     private BigDecimal maxPrice;
     private Boolean hasImages;
     private Integer categoryId;
+    private Integer size;
+    private Integer page;
 }

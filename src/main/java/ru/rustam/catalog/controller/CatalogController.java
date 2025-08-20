@@ -13,6 +13,7 @@ import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.service.CatalogService;
 
+import javax.swing.*;
 import java.util.List;
 
 @RestController
@@ -46,6 +47,11 @@ public class CatalogController {
     @PostMapping("/search")
     public Page<CatalogDto> search(@RequestBody FilteredCatalogDto filter) {
         return catalogService.search(filter);
+    }
+
+    @PostMapping("/newsearch")
+    public List<CatalogDto> searchNew(@RequestBody FilteredCatalogDto filter) {
+        return catalogService.searchnew(filter);
     }
 
     @PutMapping("/{id}") // СПРОСИТЬ ПРО PatchMapping

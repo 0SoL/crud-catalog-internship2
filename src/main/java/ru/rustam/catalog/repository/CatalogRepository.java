@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.rustam.catalog.entity.CatalogEntity;
 
 import java.math.BigDecimal;
@@ -19,7 +20,6 @@ public interface CatalogRepository extends JpaRepository<CatalogEntity, Integer>
         OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%'))
         OR LOWER(c.description) LIKE LOWER(CONCAT('%', :name, '%'))
     )
-    AND (:description IS NULL OR LOWER(c.description) LIKE LOWER(CONCAT('%', :description, '%')))
     AND (:minPrice IS NULL OR c.price >= :minPrice)
     AND (:maxPrice IS NULL OR c.price <= :maxPrice)
     AND (
@@ -36,4 +36,13 @@ public interface CatalogRepository extends JpaRepository<CatalogEntity, Integer>
                                @Param("hasImage") Boolean hasImages,
                                @Param("categoryId") Integer categoryId,
                                Pageable pageable);
+
 }
+
+
+
+// Не хардкодить pageable
+// Категория DTO
+// лишний desription
+// Новый таск
+// Фильтра но по другому , через прямые sql запросы(jdbcTemplate). отдельный эндпоит для этого , другой метод. написать вручную Pageable

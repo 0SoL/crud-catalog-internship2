@@ -17,6 +17,7 @@ import ru.rustam.catalog.entity.FileEntity;
 import ru.rustam.catalog.exception.ImageException;
 import ru.rustam.catalog.mapper.CatalogMapper;
 import ru.rustam.catalog.entity.CatalogEntity;
+import ru.rustam.catalog.repository.CatalogNewRepository;
 import ru.rustam.catalog.repository.CatalogRepository;
 import ru.rustam.catalog.repository.CategoryRepository;
 import ru.rustam.catalog.repository.FileRepository;
@@ -32,13 +33,15 @@ public class CatalogService {
     private final FileRepository fileRepository;
     private final CatalogMapper catalogMapper;
     private final CategoryRepository categoryRepository;
+    private final CatalogNewRepository catalogNewRepository;
 
     @Autowired
-    public CatalogService(CatalogRepository catalogRepository, FileRepository fileRepository, CatalogMapper catalogMapper, CategoryRepository categoryRepository) {
+    public CatalogService(CatalogRepository catalogRepository, FileRepository fileRepository, CatalogMapper catalogMapper, CategoryRepository categoryRepository, CatalogNewRepository catalogNewRepository) {
         this.catalogRepository = catalogRepository;
         this.fileRepository = fileRepository;
         this.catalogMapper = catalogMapper;
         this.categoryRepository = categoryRepository;
+        this.catalogNewRepository = catalogNewRepository;
     }
 
     public CatalogDto create(CreateCatalogDto createCatalogDto) {
@@ -135,6 +138,17 @@ public class CatalogService {
                 filter.getCategoryId(),
                 pageable
         ).map(catalogMapper::toDto);
+    }
+
+    public List<CatalogDto> searchnew(FilteredCatalogDto filter) {
+        return catalogNewRepository.searchProduct(
+                filter.getName(),
+                filter.getMinPrice(),
+                filter.getMaxPrice(),
+                filter.getHasImages(),
+                filter.getPage() ==  null ? 1 : filter.getPage(),
+                filter.getSize() == null ? 5 : filter.getSize()
+        ).stream().map(catalogMapper::toDto).toList();
     }
 
 
