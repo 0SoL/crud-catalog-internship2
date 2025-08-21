@@ -14,9 +14,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<String>> handeNotValidException(MethodArgumentNotValidException ex) {
         List<String> errors = ex.getBindingResult()
-                .getFieldErrors() // запрашивает класс FieldError
-                .stream() // собиарем поток данных из коллекции
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())   // пересобираем используем методы класса FieldError получаем строчку и сообщенеие которое я укзаал в валидаторе
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .toList();
 
         return ResponseEntity.badRequest().body(errors);

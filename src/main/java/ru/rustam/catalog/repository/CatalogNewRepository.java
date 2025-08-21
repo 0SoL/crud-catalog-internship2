@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.entity.CategoryEntity;
 import ru.rustam.catalog.entity.FileEntity;
+import ru.rustam.catalog.mapper.FilterMapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class CatalogNewRepository {
     }
 
     public List<CatalogEntity> searchProduct(String name, BigDecimal minPrice, BigDecimal maxPrice,Boolean hasImages, int page, int size) {
-        StringBuilder sqlQuery = new StringBuilder("SELECT c.* FROM catalog c WHERE");
+        StringBuilder sqlQuery = new StringBuilder("SELECT c.*, ARRAY_AGG(i.id) AS image_ids FROM catalog c LEFT JOIN image i ON c.id = i.catalog_id WHERE");
         List<Object> params = new ArrayList<>();
 
         if (name != null && !name.isEmpty()) {
@@ -42,31 +43,12 @@ public class CatalogNewRepository {
             sqlQuery.append(" ? = TRUE AND EXISTS (SELECT 1 FROM image i WHERE i.catalog_id = c.id)");
             params.add(hasImages);
         }
-
+        sqlQuery.append(" GROUP BY c.id ");
         sqlQuery.append(" LIMIT ? OFFSET ?");
         params.add(size);
         params.add((page-1)*size);
 
-        return jdbcTemplate.query(
-                sqlQuery.toString(),
-                (rs, rowNum) -> {
-                    CatalogEntity catalogEntity = new CatalogEntity();
-                    CategoryEntity categoryEntity = new CategoryEntity();
-                    FileEntity primaryImage = new FileEntity();
-                    catalogEntity.setId(rs.getInt("id"));
-                    catalogEntity.setName(rs.getString("name"));
-                    catalogEntity.setDescription(rs.getString("description"));
-                    catalogEntity.setPrice(rs.getBigDecimal("price"));
+        return jdbcTemplate.query(sqlQuery.toString(), new FilterMapper(), params.toArray());
 
-                    categoryEntity.setId(rs.getInt("category_id"));
-                    catalogEntity.setCategory(categoryEntity);
-
-                    primaryImage.setId(rs.getInt("primary_image_id"));
-                    catalogEntity.setPrimaryImage(primaryImage);
-
-                    catalogEntity.setImages(new ArrayList<>());
-                    return catalogEntity;
-                },params.toArray()
-        );
     }
 }

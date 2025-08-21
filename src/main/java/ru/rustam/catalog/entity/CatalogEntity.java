@@ -38,7 +38,5 @@ public class CatalogEntity {
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
-    public CatalogEntity(int id, String name, String description, BigDecimal price) {
-    }
 }
 

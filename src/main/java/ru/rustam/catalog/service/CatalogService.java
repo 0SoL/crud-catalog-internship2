@@ -23,7 +23,6 @@ import ru.rustam.catalog.repository.CategoryRepository;
 import ru.rustam.catalog.repository.FileRepository;
 
 import java.awt.*;
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
