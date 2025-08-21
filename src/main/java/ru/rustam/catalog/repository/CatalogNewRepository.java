@@ -54,10 +54,7 @@ public class CatalogNewRepository {
         }
 
         String countSql = "SELECT COUNT(*) FROM catalog c " + where;
-        Long total = jdbcTemplate.queryForObject(countSql, params.toArray(), Long.class);
-
-        System.out.println("TOTAL: " + total);
-
+        Long total = jdbcTemplate.queryForObject(countSql, Long.class);
         if (total == null) {
             return new PageImpl<>(List.of(), pageable, 0);
         }
@@ -65,13 +62,12 @@ public class CatalogNewRepository {
         StringBuilder selectSql = new StringBuilder(
                 "SELECT c.* " +
                 "FROM catalog c " +
-                where
+                where +
+                "LIMIT ? OFFSET ? "
         );
 
-        selectSql.append(" LIMIT ? OFFSET ? ");
-        List<Object> dataParams = new ArrayList<>(params);
-        dataParams.add(pageable.getPageSize());
-        dataParams.add((int) pageable.getOffset());
+        params.add(pageable.getPageSize());
+        params.add((int) pageable.getOffset());
 
         List<CatalogEntity> content = jdbcTemplate.query(
                 selectSql.toString(),
@@ -102,14 +98,8 @@ public class CatalogNewRepository {
                     catalogEntity.setImages(images);
                     return catalogEntity;
 
-                },dataParams.toArray()
+                },params.toArray()
         );
-
-        System.out.println("DATAPARAMS: " + dataParams);
-        System.out.println("PARAMS: " + params);
-        System.out.println("CONTENT: " + content);
-        System.out.println("PAGEABLE: " + pageable);
-        System.out.println("TOTAL: " + total);
         return new PageImpl<>(content, pageable, total);
     }
 }
