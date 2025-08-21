@@ -28,12 +28,10 @@ public class CatalogEntity {
     private BigDecimal price;
     @OneToMany(cascade = CascadeType.ALL,
                 mappedBy = "catalog")
-    private List<FileEntity> images = new ArrayList<>();// ImageEntity BeDirectional связь.
+    private List<FileEntity> images = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "primary_image_id")
-    private FileEntity primaryImage; // перенсти сущность FileEntity , оставить ссылку на FileEntity
-
-
+    private FileEntity primaryImage;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private CategoryEntity category;

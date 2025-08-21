@@ -17,5 +17,5 @@ public class CatalogDto {
     private List<FileDto> images;
     private Integer category;
 }
-
+// pageable в requestparam
 

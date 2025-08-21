@@ -18,7 +18,7 @@ public class CatalogNewRepository {
     public CatalogNewRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
+    // filter занести туда
     public List<CatalogEntity> searchProduct(String name, BigDecimal minPrice, BigDecimal maxPrice,Boolean hasImages, int page, int size) {
         StringBuilder sqlQuery = new StringBuilder("SELECT c.*, ARRAY_AGG(i.id) AS image_ids FROM catalog c LEFT JOIN image i ON c.id = i.catalog_id WHERE");
         List<Object> params = new ArrayList<>();
@@ -49,6 +49,5 @@ public class CatalogNewRepository {
         params.add((page-1)*size);
 
         return jdbcTemplate.query(sqlQuery.toString(), new FilterMapper(), params.toArray());
-
     }
 }

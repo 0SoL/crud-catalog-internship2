@@ -150,7 +150,6 @@ public class CatalogService {
         ).stream().map(catalogMapper::toDto).toList();
     }
 
-
     private CatalogEntity getCatalogEntity(Integer id) {
         return catalogRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукт не найден!"));

@@ -38,11 +38,3 @@ public interface CatalogRepository extends JpaRepository<CatalogEntity, Integer>
                                Pageable pageable);
 
 }
-
-
-
-// Не хардкодить pageable
-// Категория DTO
-// лишний desription
-// Новый таск
-// Фильтра но по другому , через прямые sql запросы(jdbcTemplate). отдельный эндпоит для этого , другой метод. написать вручную Pageable
