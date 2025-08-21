@@ -2,13 +2,18 @@ package ru.rustam.catalog.controller;
 
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
+import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
+import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.service.CatalogService;
 
+import javax.swing.*;
 import java.util.List;
 
 @RestController
@@ -39,46 +44,25 @@ public class CatalogController {
         return catalogService.findAll();
     }
 
-    @PutMapping("/{id}") // СПРОСИТЬ ПРО PatchMapping
+    @PostMapping("/search")
+    public Page<CatalogDto> search(@RequestBody FilteredCatalogDto filter) {
+        return catalogService.search(filter);
+    }
+
+    @PostMapping("/newsearch")
+    public List<CatalogDto> searchNew(@RequestBody FilteredCatalogDto filter) {
+        return catalogService.searchnew(filter);
+    }
+
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CatalogDto updateById(@PathVariable("id") Integer id,
                                  @Valid @RequestBody UpdateCatalogDto updateCatalogDto) {
         return catalogService.updateById(id, updateCatalogDto);
     }
-
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Integer id) {
         catalogService.deleteById(id);
     }
 }
-
-
-// Для создания создавать new Dto отдельный ,
-// Integer ,
-// два метода одинаковые названияч,
-// постман ,
-// просто класс для маппинга вместо интерфейс(сделать его бином @Mapper)
-// маппер, прайваты ,
-// рефакторить код добавить методы,
-// ознакомится со stream()
-
-
-// 13 августа , yml , мерджить , убрать validated. yml noun.
-
-// Task. Добавление изображение, когда все товары выводим , показываем путь к мейн фото. Когда к определенному , все фотографии все пути этого товара.
-// ManyToOne. Улучшить с метод с фотками, эндпойт. Изменить фотографию методы и тд.
-
-
-// Сначала файнал поля
-// Вынести в контсанту
-// Завести enum для проверок формата файла
-// новые миграции создавать
-// убрать column
-// експешн чтоб не конфликтовало с фотками
-// begenerational связь
-// создать свой exception кастомный унаследовать runtime и кидать (400)
-// проверить варнинги
-// избавится от querry. File Entity
-
-// Нужен эндпоинт для запроса файла. по айдишнику /images/id.

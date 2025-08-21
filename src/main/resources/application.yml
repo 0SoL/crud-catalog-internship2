@@ -17,6 +17,11 @@ spring:
       hibernate.format_sql: true
     generate-ddl: false
 server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   port: 8080
 file:
   upload-path: ${MEDIA_PATH:/some}

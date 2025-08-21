@@ -21,4 +21,5 @@ public class CreateCatalogDto {
     private BigDecimal price;
     private List<Integer> imagesIds;
     private Integer primaryImage;
+    private Integer category;
 }
