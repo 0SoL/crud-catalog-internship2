@@ -68,15 +68,15 @@ public class CatalogNewRepository {
 
         params.add(pageable.getPageSize());
         params.add((int) pageable.getOffset());
-
         if (pageable.getSort().isSorted()) {
             Sort.Order order  = pageable.getSort().iterator().next();
             String property = order.getProperty();
             if (property.equalsIgnoreCase("name")) {
                 String sortBy = "c.name";
+                selectSql.append(" ORDER BY ").append(sortBy).append(" ").append(order.getDirection());
             } else if (property.equalsIgnoreCase("price")) {
                 String sortBy = "c.price";
-                selectSql.append(" ORDER BY ").append(sortBy);
+                selectSql.append(" ORDER BY ").append(sortBy).append(" ").append(order.getDirection());
             }
         }
 
