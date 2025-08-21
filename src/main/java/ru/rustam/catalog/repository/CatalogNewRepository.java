@@ -3,6 +3,7 @@ package ru.rustam.catalog.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -62,12 +63,24 @@ public class CatalogNewRepository {
         StringBuilder selectSql = new StringBuilder(
                 "SELECT c.* " +
                 "FROM catalog c " +
-                where +
-                "LIMIT ? OFFSET ? "
+                where
         );
 
         params.add(pageable.getPageSize());
         params.add((int) pageable.getOffset());
+
+        if (pageable.getSort().isSorted()) {
+            Sort.Order order  = pageable.getSort().iterator().next();
+            String property = order.getProperty();
+            if (property.equalsIgnoreCase("name")) {
+                String sortBy = "c.name";
+            } else if (property.equalsIgnoreCase("price")) {
+                String sortBy = "c.price";
+                selectSql.append(" ORDER BY ").append(sortBy);
+            }
+        }
+
+        selectSql.append(" LIMIT ? OFFSET ?");
 
         List<CatalogEntity> content = jdbcTemplate.query(
                 selectSql.toString(),
