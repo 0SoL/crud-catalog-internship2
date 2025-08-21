@@ -10,8 +10,8 @@ public class FileMapper {
         FileDto dto = new FileDto();
         dto.setId(e.getId());
         dto.setName(e.getName());
-        dto.setType(e.getType());
-        dto.setFilepath(e.getFilepath());
+//        dto.setType(e.getType());
+//        dto.setFilepath(e.getFilepath());
         return dto;
     }
 }

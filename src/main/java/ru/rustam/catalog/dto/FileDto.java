@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class FileDto {
     private Integer id;
-    private String filepath;
+//    private String filepath;
     private String name;
-    private String type;
+//    private String type;
 }

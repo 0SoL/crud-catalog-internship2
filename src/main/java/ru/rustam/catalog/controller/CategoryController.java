@@ -1,11 +1,9 @@
 package ru.rustam.catalog.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.rustam.catalog.dto.CategoryDto;
-import ru.rustam.catalog.entity.CategoryEntity;
 import ru.rustam.catalog.service.CategoryService;
 
 import java.util.List;

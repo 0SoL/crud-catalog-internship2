@@ -139,15 +139,8 @@ public class CatalogService {
         ).map(catalogMapper::toDto);
     }
 
-    public List<CatalogDto> searchnew(FilteredCatalogDto filter) {
-        return catalogNewRepository.searchProduct(
-                filter.getName(),
-                filter.getMinPrice(),
-                filter.getMaxPrice(),
-                filter.getHasImages(),
-                filter.getPage() ==  null ? 1 : filter.getPage(),
-                filter.getSize() == null ? 5 : filter.getSize()
-        ).stream().map(catalogMapper::toDto).toList();
+    public Page<CatalogDto> searchnew(FilteredCatalogDto filter, Pageable pageable) {
+        return catalogNewRepository.searchProduct(filter, pageable).map(catalogMapper::toDto);
     }
 
     private CatalogEntity getCatalogEntity(Integer id) {
