@@ -12,7 +12,6 @@ import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.entity.CategoryEntity;
 import ru.rustam.catalog.entity.FileEntity;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,14 +68,15 @@ public class CatalogNewRepository {
         params.add(pageable.getPageSize());
         params.add((int) pageable.getOffset());
         if (pageable.getSort().isSorted()) {
+            selectSql.append(" ORDER BY ");
             Sort.Order order  = pageable.getSort().iterator().next();
             String property = order.getProperty();
             if (property.equalsIgnoreCase("name")) {
                 String sortBy = "c.name";
-                selectSql.append(" ORDER BY ").append(sortBy).append(" ").append(order.getDirection());
+                selectSql.append(sortBy).append(" ").append(order.getDirection());
             } else if (property.equalsIgnoreCase("price")) {
                 String sortBy = "c.price";
-                selectSql.append(" ORDER BY ").append(sortBy).append(" ").append(order.getDirection());
+                selectSql.append(sortBy).append(" ").append(order.getDirection());
             }
         }
 
