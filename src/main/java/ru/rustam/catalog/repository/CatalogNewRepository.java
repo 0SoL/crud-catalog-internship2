@@ -23,13 +23,8 @@ public class CatalogNewRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private static final StringBuilder BASE_SELECT = new StringBuilder(
-            "SELECT c.* FROM catalog c "
-    );
-
-    private static final StringBuilder COUNT_SELECT = new StringBuilder(
-            "SELECT COUNT(*) FROM catalog c "
-    );
+    private static final String BASE_SELECT = "SELECT c.* FROM catalog c ";
+    private static final String COUNT_SELECT = "SELECT COUNT(*) FROM catalog c ";
 
     public Page<CatalogEntity> searchProduct(FilteredCatalogDto filteredCatalogDto, Pageable pageable) {
         List<Object> params = new ArrayList<>();
@@ -59,7 +54,6 @@ public class CatalogNewRepository {
         }
 
         String where = filters.isEmpty() ? "" : "WHERE " + String.join(" AND ", filters);
-
         StringBuilder countSql = new StringBuilder(COUNT_SELECT).append(where);
 
         Long total = jdbcTemplate.queryForObject(countSql.toString(), params.toArray() ,Long.class);
@@ -69,7 +63,6 @@ public class CatalogNewRepository {
 
         StringBuilder selectSql = new StringBuilder(BASE_SELECT).append(where);
 
-        System.out.println(selectSql);
 
         if (pageable.getSort().isSorted()) {
             selectSql.append("ORDER BY ");
@@ -84,7 +77,6 @@ public class CatalogNewRepository {
         selectSql.append(" LIMIT ? OFFSET ?");
         params.add(pageable.getPageSize());
         params.add((int) pageable.getOffset());
-        // map в для поиска
 
         List<CatalogEntity> content = jdbcTemplate.query(
                 selectSql.toString(),
@@ -103,17 +95,16 @@ public class CatalogNewRepository {
                     primaryImage.setId(rs.getInt("primary_image_id"));
                     catalogEntity.setPrimaryImage(primaryImage);
 
-                    // Оптимизировать эту часть
-//                    List<FileEntity> images = jdbcTemplate.query(
-//                            "SELECT id,name FROM image WHERE catalog_id = ?",
-//                            (rsImg, rowNumImg) -> {
-//                                FileEntity fileEntity = new FileEntity();
-//                                fileEntity.setId(rsImg.getInt("id"));
-//                                fileEntity.setName(rsImg.getString("name"));
-//                                return fileEntity;
-//                            },catalogEntity.getId()
-//                    );
-//                    catalogEntity.setImages(images);
+                    List<FileEntity> images = jdbcTemplate.query(
+                            "SELECT id,name FROM image WHERE catalog_id = ?",
+                            (rsImg, rowNumImg) -> {
+                                FileEntity fileEntity = new FileEntity();
+                                fileEntity.setId(rsImg.getInt("id"));
+                                fileEntity.setName(rsImg.getString("name"));
+                                return fileEntity;
+                            },catalogEntity.getId()
+                    );
+                    catalogEntity.setImages(images);
                     return catalogEntity;
 
                 },
