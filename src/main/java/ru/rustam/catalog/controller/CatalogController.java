@@ -10,7 +10,6 @@ import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.CreateCatalogDto;
 import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
-import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.service.CatalogService;
 
 import javax.swing.*;
@@ -50,8 +49,9 @@ public class CatalogController {
     }
 
     @PostMapping("/newsearch")
-    public List<CatalogDto> searchNew(@RequestBody FilteredCatalogDto filter) {
-        return catalogService.searchnew(filter);
+    public Page<CatalogDto> searchNew(@RequestBody FilteredCatalogDto filter,
+                                      Pageable pageable) {
+        return catalogService.searchnew(filter, pageable);
     }
 
     @PutMapping("/{id}")
