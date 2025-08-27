@@ -1,5 +1,6 @@
 package ru.rustam.catalog.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -11,26 +12,32 @@ import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.entity.CategoryEntity;
 import ru.rustam.catalog.entity.FileEntity;
+import ru.rustam.catalog.exception.FileException;
 
 import java.sql.ResultSet;
 import java.util.*;
 
+@Slf4j
 @Repository
 public class CatalogNewRepository {
     private final JdbcTemplate jdbcTemplate;
+    private static final String BASE_SELECT = "SELECT c.* FROM catalog c ";
+    private static final String COUNT_SELECT = "SELECT COUNT(*) FROM catalog c ";
+    private static final Map<String, String> SORT_MAP = Map.of(
+        "name", "c.name",
+        "price" , "c.price"
+    );
+
 
     public CatalogNewRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private static final String BASE_SELECT = "SELECT c.* FROM catalog c ";
-    private static final String COUNT_SELECT = "SELECT COUNT(*) FROM catalog c ";
-
     public Page<CatalogEntity> searchProduct(FilteredCatalogDto filteredCatalogDto, Pageable pageable) {
         List<Object> params = new ArrayList<>();
         List<String> filters = new ArrayList<>();
         if (StringUtils.hasText(filteredCatalogDto.getName())) {
-            filters.add("(LOWER(c.name) LIKE LOWER(?) OR LOWER(c.description) LIKE LOWER(?))");
+            filters.add("(c.name ILIKE ? OR c.description ILIKE ?)");
             params.add("%" + filteredCatalogDto.getName() + "%");
             params.add("%" + filteredCatalogDto.getName() + "%");
         }
@@ -57,7 +64,7 @@ public class CatalogNewRepository {
         StringBuilder countSql = new StringBuilder(COUNT_SELECT).append(where);
 
         Long total = jdbcTemplate.queryForObject(countSql.toString(), params.toArray() ,Long.class);
-        if (total == null) {
+        if (total == 0) {
             return new PageImpl<>(List.of(), pageable, 0);
         }
 
@@ -67,9 +74,16 @@ public class CatalogNewRepository {
         if (pageable.getSort().isSorted()) {
             selectSql.append("ORDER BY ");
             List<String> sort = new ArrayList<>();
+
             for (Sort.Order item : pageable.getSort()) {
                 String property = item.getProperty();
-                sort.add(property + " " + item.getDirection());
+
+                String column = SORT_MAP.get(property);
+                if (column != null) {
+                    sort.add(column + " " + item.getDirection());
+                } else {
+                    throw new FileException("Ошибка в фильтре");
+                }
             }
             selectSql.append(String.join(", ", sort));
         }

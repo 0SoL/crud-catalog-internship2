@@ -1,6 +1,9 @@
 package ru.rustam.catalog.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +28,27 @@ public class CatalogController {
         this.catalogService = catalogService;
     }
 
+    @Operation(
+            summary = "Создать товар",
+            description = "Создает товар в базе данных"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Создан"),
+    })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CatalogDto create(@Valid @RequestBody CreateCatalogDto createCatalogDto) {
         return catalogService.create(createCatalogDto);
     }
 
+    @Operation(
+            summary = "Получить товар",
+            description = "Возвращает товар по указаному id"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ок"),
+            @ApiResponse(responseCode = "404", description = "Не найден")
+    })
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CatalogDto findById(@PathVariable("id") Integer id) {

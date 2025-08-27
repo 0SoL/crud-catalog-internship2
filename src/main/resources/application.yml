@@ -16,6 +16,9 @@ spring:
     properties:
       hibernate.format_sql: true
     generate-ddl: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 server:
   servlet:
     encoding:

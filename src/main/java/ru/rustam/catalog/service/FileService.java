@@ -7,11 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.rustam.catalog.dto.FileDto;
 import ru.rustam.catalog.entity.FileEntity;
-import ru.rustam.catalog.exception.FileHandlerException;
+import ru.rustam.catalog.exception.FileException;
 import ru.rustam.catalog.mapper.FileMapper;
 import ru.rustam.catalog.repository.FileRepository;
 
-import java.awt.*;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,10 +30,10 @@ public class FileService {
 
     public FileDto save(MultipartFile file) {
         if (file.getSize() > maxByte) {
-            throw new FileHandlerException("Размер файла слишком большой! " + file.getOriginalFilename());
+            throw new FileException("Размер файла слишком большой! " + file.getOriginalFilename());
         }
         if (!ImageType.isImageType(file.getContentType())) {
-            throw new FileHandlerException("Не поддерживаемый тип файла! "  + file.getContentType());
+            throw new FileException("Не поддерживаемый тип файла! "  + file.getContentType());
         }
         FileEntity fileEntity = new FileEntity();
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
@@ -49,7 +48,7 @@ public class FileService {
     }
 
     public FileDto findFileById(Integer id) {
-        FileEntity fileEntity = fileRepository.findById(id).orElseThrow(() -> new FileHandlerException("Файл с таким id не был найден: " + id));
+        FileEntity fileEntity = fileRepository.findById(id).orElseThrow(() -> new FileException("Файл с таким id не был найден: " + id));
         return fileMapper.toDto(fileEntity);
     }
 

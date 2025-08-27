@@ -3,7 +3,7 @@ package ru.rustam.catalog.service;
 import org.springframework.stereotype.Service;
 import ru.rustam.catalog.dto.CategoryDto;
 import ru.rustam.catalog.entity.CategoryEntity;
-import ru.rustam.catalog.exception.FileHandlerException;
+import ru.rustam.catalog.exception.FileException;
 import ru.rustam.catalog.mapper.CategoryMapper;
 import ru.rustam.catalog.repository.CategoryRepository;
 
@@ -32,14 +32,14 @@ public class CategoryService {
     }
 
     public CategoryDto update(Integer id, CategoryDto categoryDto) {
-        CategoryEntity categoryEntity = categoryRepository.findById(id).orElseThrow(() -> new FileHandlerException("Error"));
+        CategoryEntity categoryEntity = categoryRepository.findById(id).orElseThrow(() -> new FileException("Error"));
         categoryEntity.setName(categoryDto.getName());
         categoryRepository.save(categoryEntity);
         return categoryMapper.toDto(categoryEntity);
     }
 
     public void delete(Integer id) {
-        CategoryEntity categoryEntity = categoryRepository.findById(id).orElseThrow(() -> new FileHandlerException("Error"));
+        CategoryEntity categoryEntity = categoryRepository.findById(id).orElseThrow(() -> new FileException("Error"));
         categoryRepository.delete(categoryEntity);
     }
 }
