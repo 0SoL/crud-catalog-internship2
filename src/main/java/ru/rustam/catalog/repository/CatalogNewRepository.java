@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
+import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.entity.CategoryEntity;
@@ -34,8 +35,45 @@ public class CatalogNewRepository {
     }
 
     public Page<CatalogEntity> searchProduct(FilteredCatalogDto filteredCatalogDto, Pageable pageable) {
+        FilterQuery q = buildFilterQuery(filteredCatalogDto);
+
+        if (q.total == 0) {
+            return new PageImpl<>(List.of(), pageable, 0);
+        }
+
+        StringBuilder selectSql = new StringBuilder(BASE_SELECT).append(q.whereSql);
+
+        if (pageable.getSort().isSorted()) {
+            selectSql.append("ORDER BY ");
+            List<String> sort = new ArrayList<>();
+
+            for (Sort.Order item : pageable.getSort()) {
+                String property = item.getProperty();
+
+                String column = SORT_MAP.get(property);
+                if (column != null) {
+                    sort.add(column + " " + item.getDirection());
+                } else {
+                    throw new FileException("Ошибка в фильтре");
+                }
+            }
+            selectSql.append(String.join(", ", sort));
+        }
+
+        selectSql.append(" LIMIT ? OFFSET ?");
+        q.params.add(pageable.getPageSize());
+        q.params.add((int) pageable.getOffset());
+
+        List<CatalogEntity> content = loadPage(selectSql, q.params);
+        mapImages(content);
+
+        return new PageImpl<>(content, pageable, q.total);
+    }
+
+    private FilterQuery buildFilterQuery(FilteredCatalogDto filteredCatalogDto) {
         List<Object> params = new ArrayList<>();
         List<String> filters = new ArrayList<>();
+
         if (StringUtils.hasText(filteredCatalogDto.getName())) {
             filters.add("(c.name ILIKE ? OR c.description ILIKE ?)");
             params.add("%" + filteredCatalogDto.getName() + "%");
@@ -60,39 +98,16 @@ public class CatalogNewRepository {
             }
         }
 
-        String where = filters.isEmpty() ? "" : "WHERE " + String.join(" AND ", filters);
-        StringBuilder countSql = new StringBuilder(COUNT_SELECT).append(where);
+        String whereSql = filters.isEmpty() ? "" : "WHERE " + String.join(" AND ", filters);
 
+        StringBuilder countSql = new StringBuilder(COUNT_SELECT).append(whereSql);
         Long total = jdbcTemplate.queryForObject(countSql.toString(), params.toArray() ,Long.class);
-        if (total == 0) {
-            return new PageImpl<>(List.of(), pageable, 0);
-        }
 
-        StringBuilder selectSql = new StringBuilder(BASE_SELECT).append(where);
+        return new FilterQuery(whereSql, params, total);
+    };
 
-
-        if (pageable.getSort().isSorted()) {
-            selectSql.append("ORDER BY ");
-            List<String> sort = new ArrayList<>();
-
-            for (Sort.Order item : pageable.getSort()) {
-                String property = item.getProperty();
-
-                String column = SORT_MAP.get(property);
-                if (column != null) {
-                    sort.add(column + " " + item.getDirection());
-                } else {
-                    throw new FileException("Ошибка в фильтре");
-                }
-            }
-            selectSql.append(String.join(", ", sort));
-        }
-
-        selectSql.append(" LIMIT ? OFFSET ?");
-        params.add(pageable.getPageSize());
-        params.add((int) pageable.getOffset());
-
-        List<CatalogEntity> content = jdbcTemplate.query(
+    private List<CatalogEntity> loadPage(StringBuilder selectSql, List<Object> params) {
+        return jdbcTemplate.query(
                 selectSql.toString(),
                 (rs, rowNum) -> {
                     CatalogEntity catalogEntity = new CatalogEntity();
@@ -124,10 +139,10 @@ public class CatalogNewRepository {
                 },
                 params.toArray()
         );
+    }
 
-        if (content.isEmpty()) {
-            return new PageImpl<>(content, pageable, total);
-        }
+    private void mapImages(List<CatalogEntity> content) {
+        if (content.isEmpty()) return;
 
         List<Integer> catalogIds = content.stream()
                 .map(CatalogEntity::getId)
@@ -156,6 +171,7 @@ public class CatalogNewRepository {
                     catalog.setImages(imagesMap.getOrDefault(catalog.getId(), new ArrayList<>()))
             );
         }
-        return new PageImpl<>(content, pageable, total);
     }
+
+    private record FilterQuery(String whereSql, List<Object> params, Long total) {}
 }
