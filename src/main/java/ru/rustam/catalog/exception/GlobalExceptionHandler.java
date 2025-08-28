@@ -23,8 +23,8 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(FileHandlerException.class)
-    public ResponseEntity<String> handeFileHandlerException(FileHandlerException ex) {
+    @ExceptionHandler(FileException.class)
+    public ResponseEntity<String> handeFileHandlerException(FileException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

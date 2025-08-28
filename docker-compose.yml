@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: catalog_app
+    environment:
+      DATASOURCE_HOST: my_postgres
+      DATASOURCE_USERNAME: rustam
+      DATASOURCE_PASSWORD: pass
+    ports:
+      - "8080:8080"
+    networks: [my-shared-network]
+
+networks:
+  my-shared-network:
+    external: true
