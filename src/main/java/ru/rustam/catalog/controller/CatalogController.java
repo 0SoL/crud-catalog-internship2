@@ -35,6 +35,7 @@ public class CatalogController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Создан"),
     })
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CatalogDto create(@Valid @RequestBody CreateCatalogDto createCatalogDto) {
