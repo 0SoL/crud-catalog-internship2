@@ -6,9 +6,9 @@ spring:
   application:
     name: catalog
   datasource:
-    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:5432}/${DATASOURCE_NAME:mydb}
-    username: ${DATASOURCE_USERNAME:app_user}
-    password: ${DATASOURCE_PASSWORD:secret}
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:5432}/${DATASOURCE_NAME:catalog_db}
+    username: ${DATASOURCE_USERNAME:rustam}
+    password: ${DATASOURCE_PASSWORD:pass}
   jpa:
     hibernate:
       ddl-auto: validate

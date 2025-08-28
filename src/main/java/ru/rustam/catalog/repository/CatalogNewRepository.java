@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
-import ru.rustam.catalog.dto.CatalogDto;
 import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.entity.CatalogEntity;
 import ru.rustam.catalog.entity.CategoryEntity;
@@ -123,17 +122,6 @@ public class CatalogNewRepository {
                     FileEntity primaryImage = new FileEntity();
                     primaryImage.setId(rs.getInt("primary_image_id"));
                     catalogEntity.setPrimaryImage(primaryImage);
-
-                    List<FileEntity> images = jdbcTemplate.query(
-                            "SELECT id,name FROM image WHERE catalog_id = ?",
-                            (rsImg, rowNumImg) -> {
-                                FileEntity fileEntity = new FileEntity();
-                                fileEntity.setId(rsImg.getInt("id"));
-                                fileEntity.setName(rsImg.getString("name"));
-                                return fileEntity;
-                            },catalogEntity.getId()
-                    );
-                    catalogEntity.setImages(images);
                     return catalogEntity;
 
                 },

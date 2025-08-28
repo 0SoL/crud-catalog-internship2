@@ -84,3 +84,7 @@ public class CatalogController {
         catalogService.deleteById(id);
     }
 }
+
+// 1 Интеграционные тесты, проверка каждого контролера. Проверять ответы и сохранение в бд . framework Test Containers!! (модульные тесты ознакомится), чекать с помощью assert
+// 2 Spring Security , авторизация и тд
+// 3 Межсервисное взаимодействие. Логи остатки MockMVc
