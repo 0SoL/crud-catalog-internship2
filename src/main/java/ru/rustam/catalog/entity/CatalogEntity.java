@@ -36,5 +36,7 @@ public class CatalogEntity {
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
+    public CatalogEntity(String espresso, String aShort, BigDecimal bigDecimal) {
+    }
 }
 

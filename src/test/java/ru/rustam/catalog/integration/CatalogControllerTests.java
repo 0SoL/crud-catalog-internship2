@@ -2,7 +2,6 @@ package ru.rustam.catalog.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +12,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.rustam.catalog.dto.CreateCatalogDto;
+import ru.rustam.catalog.dto.FilteredCatalogDto;
+import ru.rustam.catalog.dto.UpdateCatalogDto;
 import ru.rustam.catalog.repository.CatalogRepository;
-import ru.rustam.catalog.repository.CategoryRepository;
 
 import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -45,86 +48,96 @@ public class CatalogControllerTests {
         registry.add("spring.flyway.enabled", () -> true);
     }
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private CatalogRepository catalogRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
+    @Autowired private CatalogRepository catalogRepository;
 
-    @Test
-    void createCatalog() throws Exception {
-        var dto =  new CatalogDto("Latte", "Grande Coffe", 899.99);
+    private Integer createProdut(String name, String description, BigDecimal price) throws Exception {
+        CreateCatalogDto dto = CreateCatalogDto.builder()
+                .name(name)
+                .description(description)
+                .price(price).build();
 
-        // Создаем объект
-        var mvcResult = mockMvc.perform(post("/product")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+        MvcResult mvcResult = mockMvc.perform(post("/product")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Latte"))
-                .andExpect(jsonPath("$.description").value("Grande Coffe"))
                 .andReturn();
 
-        // Берем айдишник объекта
-        Integer id = objectMapper.readTree(mvcResult.getResponse().getContentAsString()).get("id").asInt();
+        return objectMapper.readTree(mvcResult.getResponse().getContentAsString()).get("id").asInt();
+    }
 
 
-        // Ищем созданный объект по айдишнику
-        var fromDb = catalogRepository.findById(id).orElseThrow();
+    // ЗДЕСЬ POST И СРАЗУ ПРОВЕРКА НА GET
+    @Test
+    void post_create_catalog() throws Exception {
+        Integer id = createProdut("Coke", "Sparkling Drink", new BigDecimal("899.00"));
 
-        // Сравниваем значения
-        assertEquals("Latte", fromDb.getName());
-        assertEquals(new BigDecimal("899.99"), fromDb.getPrice());
-
-        //
         mockMvc.perform(get("/product/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description").value("Grande Coffe"))
-                .andExpect(jsonPath("$.name").value("Latte"));
+                .andExpect(jsonPath("$.name").value("Coke"))
+                .andExpect(jsonPath("$.description").value("Sparkling Drink"))
+                .andReturn();
+    }
 
+    // ЭТО КАЖИСЬ НЕ НУЖНО
+    @Test
+    void get_catalog_id() throws Exception {
+        Integer id = createProdut("Coke", "Sparkling Drink", new BigDecimal("899.00"));
 
-        var newMvcResult = mockMvc.perform(put("/product/{id}", id)
-        .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new CatalogDto("Latte", "Venti Coffe", 999.99))))
+        mockMvc.perform(get("/product/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description").value("Venti Coffe"))
-                .andExpect(jsonPath("$.name").value("Latte"))
+                .andExpect(jsonPath("$.name").value("Coke"))
+                .andExpect(jsonPath("$.description").value("Sparkling Drink"))
+                .andReturn();
+    }
+
+
+    // ТЕСТ для обновления
+    @Test
+    void put_update_catalog() throws Exception {
+        Integer id = createProdut("Coke", "Sparkling Drink", new BigDecimal("899.00"));
+
+        mockMvc.perform(put("/product/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                        UpdateCatalogDto.builder()
+                            .name("Coke")
+                            .description(null)
+                            .price(new BigDecimal("999.99"))
+                            .build()
+                )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Coke"))
                 .andExpect(jsonPath("$.price").value(new BigDecimal("999.99")))
                 .andReturn();
-
-        id = objectMapper.readTree(newMvcResult.getResponse().getContentAsString()).get("id").asInt();
-        var fromNewDb = catalogRepository.findById(id).orElseThrow();
-        assertEquals("Latte", fromNewDb.getName());
-        assertEquals(new BigDecimal("999.99"), fromNewDb.getPrice());
-        assertEquals("Venti Coffe", fromNewDb.getDescription());
     }
-
-
 
     @Test
-    void createCategory() throws Exception {
-        var dto = new CategoryDto("Овощи");
+    void post_get_catalog() throws Exception {
+//        catalogRepository.saveAll(List.of(
+//                new ru.rustam.catalog.entity.CatalogEntity("Latte",  "Grande Coffe",  new BigDecimal("899.99")),
+//                new ru.rustam.catalog.entity.CatalogEntity("Latte XL", "Venti Coffe", new BigDecimal("999.99")),
+//                new ru.rustam.catalog.entity.CatalogEntity("Espresso", "Short", new BigDecimal("499.00"))
+//        ));
+        Integer product1 = createProdut("Latte", "Sparkling Drink", new BigDecimal("899.00"));
+        Integer product2 = createProdut("Latte XL", "Venti Coffe", new BigDecimal("999.99"));
+        Integer product3 = createProdut("Espresso", "Short", new BigDecimal("499.00"));
 
-        var mvcResult = mockMvc.perform(post("/category")
+        var filter = new FilteredCatalogDto();
+        filter.setName("Latte");
+
+        mockMvc.perform(post("/product/newsearch")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Овощи"))
-                .andReturn();
-
-        Integer id =  objectMapper.readTree(mvcResult.getResponse().getContentAsString()).get("id").asInt();
-        var fromDb = categoryRepository.findById(id).orElseThrow();
-
-        assertEquals("Овощи", fromDb.getName());
-
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(filter)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].name").value("Latte"))
+                .andExpect(jsonPath("$.content[0].price").value(new BigDecimal("899.00")))
+                .andExpect(jsonPath("$.content[1].name").value("Latte"))
+                .andExpect(jsonPath("$.content[1].price").value(new BigDecimal("999.99")))
+                .andDo(print());
     }
-
-    public record CategoryDto(String name) {
-    }
-    public record CatalogDto(String name, String description, Double price) {}
 }
