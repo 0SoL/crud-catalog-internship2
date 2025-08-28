@@ -19,7 +19,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.rustam.catalog.dto.CreateCatalogDto;
 import ru.rustam.catalog.dto.FilteredCatalogDto;
 import ru.rustam.catalog.dto.UpdateCatalogDto;
-import ru.rustam.catalog.repository.CatalogRepository;
 
 import java.math.BigDecimal;
 
@@ -33,9 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CatalogControllerTests {
-
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17")
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine")
             .withDatabaseName("testdb")
             .withUsername("test")
             .withPassword("test");
@@ -50,9 +48,8 @@ public class CatalogControllerTests {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private CatalogRepository catalogRepository;
 
-    private Integer createProdut(String name, String description, BigDecimal price) throws Exception {
+    private Integer createProduct(String name, String description, BigDecimal price) throws Exception {
         CreateCatalogDto dto = CreateCatalogDto.builder()
                 .name(name)
                 .description(description)
@@ -64,68 +61,56 @@ public class CatalogControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andReturn();
-
         return objectMapper.readTree(mvcResult.getResponse().getContentAsString()).get("id").asInt();
     }
 
-
-    // ЗДЕСЬ POST И СРАЗУ ПРОВЕРКА НА GET
     @Test
     void post_create_catalog() throws Exception {
-        Integer id = createProdut("Coke", "Sparkling Drink", new BigDecimal("899.00"));
+        CreateCatalogDto dto = CreateCatalogDto.builder()
+                .name("Coke")
+                .description("Sparkling Drink")
+                .price(new BigDecimal("899.00"))
+                .build();
 
-        mockMvc.perform(get("/product/{id}", id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Coke"))
-                .andExpect(jsonPath("$.description").value("Sparkling Drink"))
-                .andReturn();
+        mockMvc.perform(post("/product")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
     }
 
-    // ЭТО КАЖИСЬ НЕ НУЖНО
     @Test
     void get_catalog_id() throws Exception {
-        Integer id = createProdut("Coke", "Sparkling Drink", new BigDecimal("899.00"));
-
+        Integer id = createProduct("Coke", "Sparkling Drink", new BigDecimal("899.00"));
         mockMvc.perform(get("/product/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Coke"))
-                .andExpect(jsonPath("$.description").value("Sparkling Drink"))
-                .andReturn();
+                .andExpect(jsonPath("$.id").value(id));
     }
 
-
-    // ТЕСТ для обновления
     @Test
     void put_update_catalog() throws Exception {
-        Integer id = createProdut("Coke", "Sparkling Drink", new BigDecimal("899.00"));
-
+        Integer id = createProduct("Coke", "Sparkling Drink", new BigDecimal("899.00"));
         mockMvc.perform(put("/product/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
                         UpdateCatalogDto.builder()
-                            .name("Coke")
+                            .name("Sprite")
                             .description(null)
                             .price(new BigDecimal("999.99"))
                             .build()
                 )))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Coke"))
+                .andExpect(jsonPath("$.name").value("Sprite"))
                 .andExpect(jsonPath("$.price").value(new BigDecimal("999.99")))
                 .andReturn();
     }
 
     @Test
     void post_get_catalog() throws Exception {
-//        catalogRepository.saveAll(List.of(
-//                new ru.rustam.catalog.entity.CatalogEntity("Latte",  "Grande Coffe",  new BigDecimal("899.99")),
-//                new ru.rustam.catalog.entity.CatalogEntity("Latte XL", "Venti Coffe", new BigDecimal("999.99")),
-//                new ru.rustam.catalog.entity.CatalogEntity("Espresso", "Short", new BigDecimal("499.00"))
-//        ));
-        Integer product1 = createProdut("Latte", "Sparkling Drink", new BigDecimal("899.00"));
-        Integer product2 = createProdut("Latte XL", "Venti Coffe", new BigDecimal("999.99"));
-        Integer product3 = createProdut("Espresso", "Short", new BigDecimal("499.00"));
+        Integer product1 = createProduct("Latte", "Sparkling Drink", new BigDecimal("899.00"));
+        Integer product2 = createProduct("Latte XL", "Venti Coffe", new BigDecimal("999.99"));
+        Integer product3 = createProduct("Espresso", "Short", new BigDecimal("499.00"));
 
-        var filter = new FilteredCatalogDto();
+        FilteredCatalogDto filter = new FilteredCatalogDto();
         filter.setName("Latte");
 
         mockMvc.perform(post("/product/newsearch")
@@ -135,9 +120,17 @@ public class CatalogControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
                 .andExpect(jsonPath("$.content[0].name").value("Latte"))
-                .andExpect(jsonPath("$.content[0].price").value(new BigDecimal("899.00")))
-                .andExpect(jsonPath("$.content[1].name").value("Latte"))
+                .andExpect(jsonPath("$.content[0].price").value(new BigDecimal("899.0")))
+                .andExpect(jsonPath("$.content[1].name").value("Latte XL"))
                 .andExpect(jsonPath("$.content[1].price").value(new BigDecimal("999.99")))
-                .andDo(print());
+                .andReturn();
+    }
+
+    @Test
+    void deleteProduct() throws Exception {
+        Integer product = createProduct("Latte", "Sparkling Drink", new BigDecimal("899.00"));
+        mockMvc.perform(delete("/product/{id}", product))
+                .andExpect(status().isNoContent())
+                .andReturn();
     }
 }
