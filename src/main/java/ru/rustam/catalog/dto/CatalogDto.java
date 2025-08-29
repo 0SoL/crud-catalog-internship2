@@ -1,13 +1,15 @@
 package ru.rustam.catalog.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CatalogDto {
     private Integer id;
     private String name;
