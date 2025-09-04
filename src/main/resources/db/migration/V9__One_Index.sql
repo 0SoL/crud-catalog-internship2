@@ -1,0 +1,1 @@
+CREATE INDEX idx_catalog_name_price ON catalog(name, description,price);
