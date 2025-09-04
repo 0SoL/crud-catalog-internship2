@@ -9,7 +9,7 @@ services:
       DATASOURCE_USERNAME: rustam
       DATASOURCE_PASSWORD: pass
     ports:
-      - "8080:8080"
+      - "8084:8084"
     networks: [my-shared-network]
 
 networks:
